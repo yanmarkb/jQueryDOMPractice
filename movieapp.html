@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Ratings</title>
+</head>
+<body>
+  <h1>Movie Ratings</h1>
+  <form id="movie-form">
+    <label for="title">Title:</label>
+    <input type="text" id="title" required minlength="2">
+    
+    <label for="rating">Rating (0-10):</label>
+    <input type="number" id="rating" min="0" max="10" required>
+    
+    <button type="submit">Submit</button>
+  </form>
+  
+  <div id="movie-list">
+    <h2>Movie List</h2>
+    <div id="sort-options">
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by">
+        <option value="title-asc">Title (A-Z)</option>
+        <option value="title-desc">Title (Z-A)</option>
+        <option value="rating-asc">Rating (Low to High)</option>
+        <option value="rating-desc">Rating (High to Low)</option>
+      </select>
+    </div>
+    <ul id="movies"></ul>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $(document).ready(function() {
+  // Initialize an array to store movies
+  var movies = [];
+
+  // Function to add a movie to the list
+  function addMovie(title, rating) {
+    movies.push({ title: title, rating: rating });
+    updateMovieList();
+  }
+
+  // Function to remove a movie from the list
+  function removeMovie(index) {
+    movies.splice(index, 1);
+    updateMovieList();
+  }
+
+  // Function to update the movie list
+  function updateMovieList() {
+    // Sort movies based on selected sort option
+    var sortBy = $("#sort-by").val();
+    if (sortBy === "title-asc") {
+      movies.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortBy === "title-desc") {
+      movies.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sortBy === "rating-asc") {
+      movies.sort((a, b) => a.rating - b.rating);
+    } else if (sortBy === "rating-desc") {
+      movies.sort((a, b) => b.rating - a.rating);
+    }
+
+    // Clear and rebuild the movie list
+    $("#movies").empty();
+    movies.forEach(function(movie, index) {
+      var listItem = $("<li>").text(movie.title + " (Rating: " + movie.rating + ")");
+      var removeButton = $("<button>").text("Remove");
+      
+      // Add click event to remove the movie
+      removeButton.click(function() {
+        removeMovie(index);
+      });
+
+      listItem.append(removeButton);
+      $("#movies").append(listItem);
+    });
+  }
+
+  // Form submission handler
+  $("#movie-form").submit(function(event) {
+    event.preventDefault();
+    var title = $("#title").val();
+    var rating = parseFloat($("#rating").val());
+
+    addMovie(title, rating);
+
+    // Clear form inputs
+    $("#title").val("");
+    $("#rating").val("");
+  });
+
+  // Initializes the movie list
+  updateMovieList();
+});
+
+  </script>
+</body>
+</html>
